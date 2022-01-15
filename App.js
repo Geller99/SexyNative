@@ -1,20 +1,41 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import * as Notifications from 'expo-notifications';
+import DrawerNavigator from './components/DrawerNavigator';
+import { registerForPushNotificationsAsync } from './utilities/registerForPushNotifications';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+/*
+
+    App.js handles Notifications, registers app tokens on expo server and stores it
+
+    NavigationContainer is root; and contains DrawerContainer which accepts multiple screens as children
+    This makes the drawer accessible from all screens of the app
+
+*/
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
 });
+
+const App = () => {
+    const [expoPushToken, setExpoPushToken] = useState('');
+    
+    useEffect(() => {
+        registerForPushNotificationsAsync()
+            .then((token) => setExpoPushToken(token))
+            .catch((err) => console.log('registerForPushNotificationsAsync error: ', err));
+    }, []);
+
+    return (
+        <NavigationContainer>
+            <DrawerNavigator {...{ expoPushToken }} />
+        </NavigationContainer>
+    );
+};
+
+export default App;
