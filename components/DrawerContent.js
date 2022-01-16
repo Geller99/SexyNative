@@ -32,11 +32,20 @@ const DrawerContent = ({
   };
 
   useEffect(() => {
+    // this useEffect only runs when a new joke is fetched...
     const { setup, delivery } = joke;
     if (setup.length > 0 && delivery.length > 0) {
       sendPushNotification({ expoPushToken, setup });
     }
 
+
+/*
+    listen for push notification, then close Drawer after responding to push notification
+
+    navigation.navigate checks stack history to see if <Drawer.Screen name="Delivery" /> exists
+    then creates one if it doesn't...
+    then accepts params as second prop item
+*/
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         navigation.closeDrawer();
